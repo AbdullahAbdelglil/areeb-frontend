@@ -129,23 +129,26 @@ export default function EventDetailsPage() {
             </Button>
           )}
         </motion.div>
-        <div className="pt-6 flex justify-center">
-        <Button
-          onClick={() => router.push('/user/homepage')}
-          variant="ghost"
-          className="group relative text-[#E0E1DD] border border-[#415A77] bg-transparent 
-               hover:bg-gradient-to-r hover:from-[#1B263B] hover:to-[#415A77]
-               hover:text-white px-6 py-2 rounded-xl transition-all duration-300 ease-in-out 
-               shadow-sm hover:shadow-[0_0_12px_rgba(65,90,119,0.6)] transform hover:scale-[1.03]"
-        >
-          <span
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#778DA9] group-hover:text-white transition-all duration-300"
-          >
-            ←
-          </span>
-          <span className="pl-5 pr-1">Back to Events</span>
-        </Button>
-      </div>
+        <div className="relative">
+          {/* Button positioned at bottom-left of the card */}
+          <div className="relative justify-center">
+            <Button
+              onClick={() => router.push('/user/homepage')}
+              variant="ghost"
+              className="group relative text-[#E0E1DD] border border-[#415A77] bg-transparent 
+                 hover:bg-gradient-to-r hover:from-[#1B263B] hover:to-[#415A77]
+                 hover:text-white px-5 py-2 rounded-xl transition-all duration-300 ease-in-out 
+                 shadow-sm hover:shadow-[0_0_12px_rgba(65,90,119,0.6)] transform hover:scale-[1.03] text-sm"
+            >
+              <span
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#778DA9] group-hover:text-white transition-all duration-300"
+              >
+                ←
+              </span>
+              <span className="pl-5 pr-1">Back to Events</span>
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
