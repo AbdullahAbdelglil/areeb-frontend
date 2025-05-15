@@ -14,6 +14,7 @@ interface EventsContextProps {
   loadMore: () => void;
   hasNewEvents: boolean;
   showNewEvents: () => void;
+  setEventBookingStatus: (eventId: number, booked: boolean) => void;
 }
 
 const EventsContext = createContext<EventsContextProps | undefined>(undefined);
@@ -142,15 +143,15 @@ export const EventsProvider = ({ children }: { children: React.ReactNode }) => {
     fetchEventsByCategory();
   }, [selectedCategoryId]);
 
-  const updateEventBookingStatus = (eventId: number) => {
-    setEvents((prevEvents) => {
-      const updatedEvents = prevEvents.map((event) =>
-        event.id === eventId ? { ...event, booked: true } : event
-      );
-      sessionStorage.setItem(getUserCacheKey(), JSON.stringify(updatedEvents));
-      return updatedEvents;
-    });
-  };
+  const setEventBookingStatus = (eventId: number, booked: boolean) => {
+  setEvents((prevEvents) => {
+    const updatedEvents = prevEvents.map((event) =>
+      event.id === eventId ? { ...event, booked } : event
+    );
+    sessionStorage.setItem(getUserCacheKey(), JSON.stringify(updatedEvents));
+    return updatedEvents;
+  });
+};
 
   return (
     <EventsContext.Provider
@@ -163,6 +164,7 @@ export const EventsProvider = ({ children }: { children: React.ReactNode }) => {
         loadMore: loadEvents,
         hasNewEvents,
         showNewEvents,
+        setEventBookingStatus,
       }}
     >
       {children}

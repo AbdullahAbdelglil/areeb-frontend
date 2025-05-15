@@ -1,27 +1,42 @@
 'use client';
 
 import { useState } from 'react';
-import { BookingDTO, cancelBooking } from '@/services/bookingsApi';
+import { BookingDTO } from '@/services/bookingsApi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Calendar, Image, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useBookingsContext } from '@/context/bookingsContext';
+import { useEventsContext } from '@/context/eventsContext';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTrigger,
+  AlertDialogCancel,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+} from '@/components/ui/alert-dialog';
 
 interface Props {
   booking: BookingDTO;
 }
 
 export default function BookingCard({ booking }: Props) {
-  const [loadingBooking, setLoadingBooking] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
-  const onCancel = async (bookingId: number) => {
+  const [showAlert, setShowAlert] = useState(false);
+  const { cancelBookingById } = useBookingsContext();
+  const { setEventBookingStatus } = useEventsContext(); // optional
+
+  const onConfirmCancel = async () => {
     setLoadingCancel(true);
     try {
-      await cancelBooking(bookingId);
+      await cancelBookingById(booking.id); // remove from cache
+      setEventBookingStatus(booking.event.id, booking.event.booked); // set booked = false in Events tab
       toast.success('Booking canceled');
-      // Optionally, trigger a reload or remove the booking from the list
     } catch {
       toast.error('Failed to cancel booking');
     } finally {
@@ -31,13 +46,15 @@ export default function BookingCard({ booking }: Props) {
 
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      viewport={{ once: true, amount: 0.2 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 40 }}
+      transition={{ duration: 0.4, ease: 'easeInOut' }}
       className="h-full"
     >
       <Card className="h-full flex flex-col justify-between bg-[#1B263B] text-[#E0E1DD] shadow-xl rounded-2xl overflow-hidden border border-[#415A77] group transition-transform transform duration-500 ease-in-out hover:scale-105 relative w-[calc(100%)]">
+        {/* IMAGE */}
         <div className="relative overflow-hidden w-full h-80">
           {booking.event.imageUrl ? (
             <img
@@ -53,6 +70,7 @@ export default function BookingCard({ booking }: Props) {
           <div className="absolute inset-0 bg-black/10 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" />
         </div>
 
+        {/* CONTENT */}
         <CardContent className="flex flex-col flex-grow p-6 space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-[#E0E1DD]">{booking.event.name}</h2>
@@ -62,9 +80,7 @@ export default function BookingCard({ booking }: Props) {
             </span>
           </div>
 
-          <p className="text-md text-[#E0E1DD] opacity-90 line-clamp-3">
-            {booking.event.description}
-          </p>
+          <p className="text-md text-[#E0E1DD] opacity-90 line-clamp-3">{booking.event.description}</p>
 
           <span className="absolute top-3 right-3 px-4 py-1 rounded-full bg-gradient-to-r from-[#1a3d6a] to-[#6a7c8a] text-white text-sm hover:scale-105 transform transition duration-300 ease-in-out shadow-md">
             {booking.event.price > 0 ? `$${booking.event.price.toFixed(2)}` : 'Free'}
@@ -75,25 +91,44 @@ export default function BookingCard({ booking }: Props) {
             Booked at: {format(new Date(booking.bookingDate), 'dd MMM yyyy')}
           </span>
 
+          {/* Cancel Button with Alert */}
           <div className="flex justify-between items-center mt-auto pt-4">
-            <Button
-              onClick={() => onCancel(booking.id)}
-              className="border border-[#778DA9] text-[#E0E1DD] hover:bg-[#415A77] hover:text-white transition-all duration-300 ease-in-out gap-2"
-              variant="ghost"
-              disabled={loadingCancel}
-            >
-              {loadingCancel ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Canceling...
-                </>
-              ) : (
-                <>
+            <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  className="border border-[#778DA9] text-[#E0E1DD] hover:bg-[#415A77] hover:text-white transition-all duration-300 ease-in-out gap-2"
+                  variant="ghost"
+                >
                   <X className="w-4 h-4" />
                   Cancel Booking
-                </>
-              )}
-            </Button>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-[#1B263B] border border-[#415A77] text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action will cancel your booking for <b>{booking.event.name}</b>.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-gray-600 text-white">Cancel</AlertDialogCancel>
+                  <Button
+                    onClick={onConfirmCancel}
+                    disabled={loadingCancel}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {loadingCancel ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Canceling...
+                      </>
+                    ) : (
+                      'Yes, Cancel it'
+                    )}
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardContent>
       </Card>

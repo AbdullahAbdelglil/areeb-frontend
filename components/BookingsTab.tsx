@@ -5,7 +5,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { BookingsProvider, useBookingsContext } from '@/context/bookingsContext';
 import BookingCard from './BookingCard';
 import { Loader2 } from 'lucide-react';
-
+import { AnimatePresence } from 'framer-motion';
 
 function BookingsTabContent() {
     const { bookings, loading, loadMore, cancelBookingById } = useBookingsContext();
@@ -36,9 +36,11 @@ function BookingsTabContent() {
     return (
         <div className="space-y-10 max-w-screen-2xl mx-auto px-4 sm:px-8 md:px-12 lg:px-20 mb-10 mt-15">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {bookings.map((booking) => (
-                    <BookingCard key={booking.id} booking={booking}/>
-                ))}
+                <AnimatePresence>
+                    {bookings.map((booking) => (
+                        <BookingCard key={booking.id} booking={booking} />
+                    ))}
+                </AnimatePresence>
             </div>
 
             {loading && (
