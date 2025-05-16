@@ -50,24 +50,24 @@ export default function AdminDashboard() {
     }, []);
 
     useEffect(() => {
-  if (!hasMore || loading) return;
+        if (!hasMore || loading) return;
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting) {
-        fetchEvents(page + 1); // pass the next page directly
-      }
-    },
-    { threshold: 1 }
-  );
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    fetchEvents(page + 1); // pass the next page directly
+                }
+            },
+            { threshold: 1 }
+        );
 
-  const ref = observerRef.current;
-  if (ref) observer.observe(ref);
+        const ref = observerRef.current;
+        if (ref) observer.observe(ref);
 
-  return () => {
-    if (ref) observer.unobserve(ref);
-  };
-}, [hasMore, loading, page, fetchEvents]);
+        return () => {
+            if (ref) observer.unobserve(ref);
+        };
+    }, [hasMore, loading, page, fetchEvents]);
 
     return (
         <div
@@ -82,8 +82,16 @@ export default function AdminDashboard() {
             <h1 className="text-4xl font-extrabold mb-8 text-center text-white tracking-wide">
                 Admin Dashboard
             </h1>
-
+            <div className="flex justify-end mb-4">
+                <Button
+                    onClick={() => router.push('/admin/event/create')}
+                    className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium shadow-md transition-all"
+                >
+                    + Create New Event
+                </Button>
+            </div>
             <div className="overflow-x-auto rounded-xl border border-[#334155] shadow-xl backdrop-blur-md bg-white/5">
+
                 <table className="min-w-full text-base text-left text-white">
                     <thead className="bg-[#1E293B] text-[#CBD5E1] uppercase tracking-wide">
                         <tr>
@@ -122,7 +130,7 @@ export default function AdminDashboard() {
                                         </span>
                                     </Button>
 
-                                    <Button
+                                    <Button onClick={() => router.push(`/admin/event/update/${event.id}`)}
                                         size="sm"
                                         variant="ghost"
                                         className="group relative text-purple-400 hover:text-purple-100 hover:bg-purple-800/30 rounded-lg 

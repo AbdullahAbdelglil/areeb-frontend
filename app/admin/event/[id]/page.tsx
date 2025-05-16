@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { getAdminEventDetails } from '@/services/adminApi';
 import { AdminViewEventDTO } from '@/app/types/AdminEvent';
 import { Loader2, ArrowLeft, Upload } from 'lucide-react';
-import axios from 'axios';
+
 import { api } from '@/services/api';
 
 export default function AdminEventDetailsPage() {
@@ -211,4 +211,4 @@ export default function AdminEventDetailsPage() {
             )}
         </div>
     );
-}
+};

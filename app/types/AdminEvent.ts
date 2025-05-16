@@ -13,3 +13,4 @@ export interface AdminViewEventDTO {
   users?: UserDTO[]; // optional
   numberOfBookings?: number; // optional
 }
+
